@@ -178,7 +178,25 @@ async function request(id) {
       if (error.response) {
         console.error(`[${id}] Status:`, error.response.status);
         console.error(`[${id}] Headers:`, JSON.stringify(error.response.headers, null, 2));
-        console.error(`[${id}] Data:`, error.response.data);
+        console.error(`[${id}] Data:`, JSON.stringify(error.response.data, null, 2));
+
+        // If there are specific error objects, log them in a more readable format
+        if (error.response.data) {
+          // Handle errors array directly in the data object
+          if (error.response.data.errors) {
+            console.error(`[${id}] Errors:`);
+            error.response.data.errors.forEach((err, index) => {
+              console.error(`  Error ${index + 1}:`, JSON.stringify(err, null, 2));
+            });
+          }
+          // Handle errors array nested in a 'response' object
+          else if (error.response.data.response && error.response.data.response.errors) {
+            console.error(`[${id}] Errors:`);
+            error.response.data.response.errors.forEach((err, index) => {
+              console.error(`  Error ${index + 1}:`, JSON.stringify(err, null, 2));
+            });
+          }
+        }
       } else {
         console.error(`[${id}] Error message:`, error.message);
         console.error(`[${id}] Error stack:`, error.stack);
